@@ -1,10 +1,12 @@
 import path from 'path';
 import isEmpty from 'lodash/isEmpty';
+import { DllReferencePlugin } from 'webpack';
 import fs from './utils/fs';
 import makeDir from 'make-dir';
 import { cacheDir } from './paths';
 import createLogger from './createLogger';
 import del from 'del';
+import { getManifestPath } from './plugin';
 
 const isCacheValid = settings => {
   return makeDir(cacheDir)
@@ -20,17 +22,38 @@ const cleanup = settings => () => {
     .each(dirname => del(path.join(cacheDir, dirname)));
 };
 
-export const runCompile = (settings, getDllCompiler) => () => {
+const doRunCompile = (settings, getDllCompiler, config) => () => {
   // skip compiling if there is nothing to build
   // if (isEmpty(settings.entry)) return;
   return new Promise((resolve, reject) => {
-    getDllCompiler().run((err, stats) => {
+    getDllCompiler(config).run((err, stats) => {
       if (err) {
         return reject(err);
       }
       resolve(stats);
     });
   });
+};
+
+export const runCompile = (settings, getDllCompiler) => {
+  if (settings.entries) {
+    return () => {
+      const entryKeys = [];
+      return settings.entries.reduce((promise, entry) => {
+        const plugins = entryKeys
+          .map(getManifestPath(settings.hash))
+          .map(manifestPath => new DllReferencePlugin({
+            context: settings.context,
+            manifest: manifestPath
+          }));
+
+        entryKeys.push(Object.keys(entry));
+
+        return promise.then(doRunCompile(settings, getDllCompiler, { entry, plugins }));
+      }, Promise.resolve());
+    };
+  }
+  return doRunCompile(settings, getDllCompiler);
 };
 
 const compileIfNeeded = (settings, getCompiler) => {

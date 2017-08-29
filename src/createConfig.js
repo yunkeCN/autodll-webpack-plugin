@@ -1,5 +1,5 @@
 import { strategy } from 'webpack-merge';
-import { DllPlugin } from 'webpack';
+import DllPlugin from './DllPlugin';
 import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash/isEqual';
 import reject from 'lodash/reject';
@@ -58,18 +58,25 @@ export const _createConfig = cacheDir => (settings, rawParentConfig) => {
 
   const parentConfig = mapParentConfig(settings, rawParentConfig);
 
+  if (settings.entries) {
+    settings.entry = settings.entry || {};
+  }
+
   const ownConfig = {
+    resolve: {
+      extensions: ['.js', '.jsx']
+    },
     context: settings.context,
     entry: settings.entry,
     plugins: [
       new DllPlugin({
         path: path.join(outputPath, '[name].manifest.json'),
-        name: '[name]_[hash]'
+        name: '[name]_[chunkhash]'
       })
     ],
     output: {
-      filename: filename,
-      library: '[name]_[hash]'
+      filename: '[name]_[chunkhash].js',
+      library: '[name]_[chunkhash]'
     }
   };
 

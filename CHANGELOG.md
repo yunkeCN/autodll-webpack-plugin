@@ -14,6 +14,10 @@ Related to [#9](https://github.com/asfktz/autodll-webpack-plugin/issues/9).
 #### Committers:
 - Suhas Karanth ([@sudo-suhas](https://github.com/sudo-suhas))
 
+## 0.3.0
+- 按依赖添加dll标签
+- output输出缓存优化
+
 ## 0.2.1
 
 #### Internal:

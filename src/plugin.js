@@ -36,7 +36,14 @@ class AutoDLLPlugin {
     console.log('context:', context);
     const getPublicDllPath = createGetPublicDllPath(settings);
 
-    keys(dllConfig.entry).map(getManifestPath(settings.hash)).forEach(manifestPath => {
+    let entry = Object.assign({}, dllConfig.entry);
+    if (settings.entries) {
+      settings.entries.forEach((item) => {
+        entry = Object.assign(entry, item);
+      });
+    }
+
+    keys(entry).map(getManifestPath(settings.hash)).forEach(manifestPath => {
       new DllReferencePlugin({
         context: context,
         manifest: manifestPath
@@ -89,14 +96,43 @@ class AutoDLLPlugin {
           'html-webpack-plugin-before-html-generation',
           (htmlPluginData, callback) => {
             const { memory } = this;
-            const bundlesPublicPaths = memory
-              .getBundles()
-              .map(({ filename }) => getPublicDllPath(filename));
+            const entrypoints = compilation.entrypoints;
 
-            htmlPluginData.assets.js = concat(
-              bundlesPublicPaths,
-              htmlPluginData.assets.js
-            );
+            const htmlChunks = Object.keys(htmlPluginData.assets.chunks);
+
+            const bundlesPublicPaths = memory.getBundles()
+              .filter((item) => {
+                let isDep = true;
+                const moduleId = `external "${item.filename.replace(/\.js$/, '')}"`;
+                const dllExternalModule = compilation.findModule(moduleId);
+                if (dllExternalModule) {
+                  htmlChunks.every((htmlChunk) => {
+                    const entrypoint = entrypoints[htmlChunk];
+                    if (entrypoint) {
+                      entrypoint.chunks.every((entrypointChunk) => {
+                        if (entrypointChunk.containsModule(dllExternalModule)) {
+                          isDep = true;
+                        }
+                        return !isDep;
+                      });
+                    }
+
+                    return !isDep;
+                  });
+                }
+
+                return isDep;
+              })
+              .map((item) => {
+                const filename = item.filename;
+                const publicPath = getPublicDllPath(filename);
+                if (!process.IS_DEBUG) {
+                  return `/${publicPath}`;
+                }
+                return publicPath;
+              });
+
+            htmlPluginData.assets.js = [].concat(bundlesPublicPaths).concat(htmlPluginData.assets.js);
 
             callback(null, htmlPluginData);
           }

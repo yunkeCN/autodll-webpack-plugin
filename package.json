@@ -1,9 +1,9 @@
 {
-  "name": "autodll-webpack-plugin",
+  "name": "@jinker/autodll-webpack-plugin",
   "author": "Asaf Katz",
   "license": "MIT",
   "version": "0.2.1",
-  "description": "",
+  "description": "[![Build Status](https://travis-ci.org/asfktz/autodll-webpack-plugin.svg?branch=master)](https://travis-ci.org/asfktz/autodll-webpack-plugin)",
   "main": "lib/index.js",
   "scripts": {
     "lint": "eslint src specs",
@@ -16,8 +16,7 @@
     "cleanup": "del-cli ./lib",
     "build": "npm run cleanup && babel src --out-dir lib",
     "build:watch": "npm run cleanup && babel src --out-dir lib --watch",
-    "prepublishOnly": "npm run build",
-    "precommit": "del-cli yarn.lock && lint-staged && npm run test"
+    "prepublishOnly": "npm run build"
   },
   "files": [
     "src",
@@ -102,5 +101,17 @@
       "babel-register"
     ],
     "babel": "inherit"
-  }
+  },
+  "directories": {
+    "example": "examples",
+    "lib": "lib"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jinker/autodll-webpack-plugin.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jinker/autodll-webpack-plugin/issues"
+  },
+  "homepage": "https://github.com/jinker/autodll-webpack-plugin#readme"
 }
