@@ -204,6 +204,32 @@ module.exports = {
         './src/admin/index.js'
     ]
 }</pre>
+if you have multiple vendor and one has depend on another, for example, redux depend react:   
+<pre>entry: {
+    vendor: [
+      'react',
+      'react-dom',
+      'moment',
+      'lodash'
+    ],
+    vendorRedux: [
+      'redux',
+      'react-redux'
+    ]
+}</pre>
+you must make sure the keys in entry in order by the dependcy, like follow:
+<pre>entry: {
+    vendor0: [
+      'react',
+      'react-dom',
+      'moment',
+      'lodash'
+    ],
+    vendor1Redux: [
+      'redux',
+      'react-redux'
+    ]
+}</pre>
             </td>
         </tr>
         <tr>

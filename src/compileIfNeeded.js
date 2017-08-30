@@ -36,24 +36,23 @@ const doRunCompile = (settings, getDllCompiler, config) => () => {
 };
 
 export const runCompile = (settings, getDllCompiler) => {
-  if (settings.entries) {
-    return () => {
-      const entryKeys = [];
-      return settings.entries.reduce((promise, entry) => {
-        const plugins = entryKeys
-          .map(getManifestPath(settings.hash))
-          .map(manifestPath => new DllReferencePlugin({
-            context: settings.context,
-            manifest: manifestPath
-          }));
+  return () => {
+    const entryKeys = [];
+    return Object.keys(settings.entry).reduce((promise, entryKey) => {
+      const entry = { [entryKey]: settings.entry[entryKey] };
 
-        entryKeys.push(Object.keys(entry));
+      const plugins = entryKeys
+        .map(getManifestPath(settings.hash))
+        .map(manifestPath => new DllReferencePlugin({
+          context: settings.context,
+          manifest: manifestPath
+        }));
 
-        return promise.then(doRunCompile(settings, getDllCompiler, { entry, plugins }));
-      }, Promise.resolve());
-    };
-  }
-  return doRunCompile(settings, getDllCompiler);
+      entryKeys.push(entryKey);
+
+      return promise.then(doRunCompile(settings, getDllCompiler, { entry, plugins }));
+    }, Promise.resolve());
+  };
 };
 
 const compileIfNeeded = (settings, getCompiler) => {

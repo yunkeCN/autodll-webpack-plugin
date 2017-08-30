@@ -36,14 +36,7 @@ class AutoDLLPlugin {
     console.log('context:', context);
     const getPublicDllPath = createGetPublicDllPath(settings);
 
-    let entry = Object.assign({}, dllConfig.entry);
-    if (settings.entries) {
-      settings.entries.forEach((item) => {
-        entry = Object.assign(entry, item);
-      });
-    }
-
-    keys(entry).map(getManifestPath(settings.hash)).forEach(manifestPath => {
+    keys(dllConfig.entry).map(getManifestPath(settings.hash)).forEach(manifestPath => {
       new DllReferencePlugin({
         context: context,
         manifest: manifestPath
@@ -59,7 +52,9 @@ class AutoDLLPlugin {
     });
 
     compiler.plugin(['run', 'watch-run'], (compiler, callback) => {
-      compileIfNeeded(settings, createDllCompiler(dllConfig))
+      const config = Object.assign({}, dllConfig);
+      delete config.entry;
+      compileIfNeeded(settings, createDllCompiler(config))
         .then((state) => {
           this.state = state;
 
@@ -102,7 +97,7 @@ class AutoDLLPlugin {
 
             const bundlesPublicPaths = memory.getBundles()
               .filter((item) => {
-                let isDep = true;
+                let isDep = false;
                 const moduleId = `external "${item.filename.replace(/\.js$/, '')}"`;
                 const dllExternalModule = compilation.findModule(moduleId);
                 if (dllExternalModule) {

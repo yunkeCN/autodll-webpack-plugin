@@ -58,10 +58,6 @@ export const _createConfig = cacheDir => (settings, rawParentConfig) => {
 
   const parentConfig = mapParentConfig(settings, rawParentConfig);
 
-  if (settings.entries) {
-    settings.entry = settings.entry || {};
-  }
-
   const ownConfig = {
     resolve: {
       extensions: ['.js', '.jsx']
