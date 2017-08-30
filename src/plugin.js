@@ -119,12 +119,7 @@ class AutoDLLPlugin {
                 return isDep;
               })
               .map((item) => {
-                const filename = item.filename;
-                const publicPath = getPublicDllPath(filename);
-                if (!process.IS_DEBUG) {
-                  return `/${publicPath}`;
-                }
-                return publicPath;
+                return getPublicDllPath(item.filename);
               });
 
             htmlPluginData.assets.js = [].concat(bundlesPublicPaths).concat(htmlPluginData.assets.js);
