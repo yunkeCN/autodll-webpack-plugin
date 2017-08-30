@@ -17,7 +17,7 @@ export const createMemory = (fs, cacheDir) => hash => {
   return fs
     .readdirAsync(path.join(cacheDir, hash))
     .catch(() => [])
-    .filter(filename => path.extname(filename) === '.js')
+    .filter(filename => /\.(js|map|css|)$/.test(path.extname(filename)))
     .map(filename =>
       join(filename, fs.readFileAsync(path.join(cacheDir, hash, filename)))
     )
