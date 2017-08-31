@@ -35,7 +35,7 @@ class LibManifestPlugin {
               const ident = module.libIdent({
                 context: this.options.context || compiler.options.context
               });
-              if (ident && !module.delegated && ident.indexOf('node_modules/webpack/') === -1) {
+              if (ident && !module.delegated && !/node_modules\/(webpack|core-js|babel-runtime)\//.test(ident)) {
                 return {
                   ident,
                   data: {
