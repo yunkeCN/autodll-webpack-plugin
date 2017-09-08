@@ -19,7 +19,7 @@ const prepare = config => {
   // omit properties that can break things
   // context is omitted becouse we already assigned the parent context as the defaults in createSettings
   // plugins are ommited by default too. It's not ideal, but it's better to let the user make a conscious choice about it.
-  return merge(omit(config, 'context',  'plugins', 'entry', 'output'), {
+  return merge(omit(config, 'context', 'plugins', 'entry', 'output'), {
     plugins
   });
 };
@@ -31,7 +31,7 @@ const mapParentConfig = (settings, rawParentConfig) => {
   if (settings.debug) {
     _originalParentConfig = cloneDeep(parentConfig);
   }
-  
+
   // The user can control what to inherit from the parent config
   // by passing a fucntion to inherit the user can take only the properties he wants.
   // At this stage, inherit is always a function. regardless of what the user set "inherit" to be.
@@ -53,7 +53,14 @@ const webpackMerge = strategy({
 });
 
 export const _createConfig = cacheDir => (settings, rawParentConfig) => {
-  const { hash, filename = [] } = settings;
+  const {
+    hash,
+    config = {}
+  } = settings;
+
+  const { output = {} } = config;
+  const { library = '[name]_[chunkhash]' } = output;
+
   const outputPath = path.join(cacheDir, hash);
 
   const parentConfig = mapParentConfig(settings, rawParentConfig);
@@ -67,12 +74,12 @@ export const _createConfig = cacheDir => (settings, rawParentConfig) => {
     plugins: [
       new DllPlugin({
         path: path.join(outputPath, '[name].manifest.json'),
-        name: '[name]_[chunkhash]'
+        name: library
       })
     ],
     output: {
-      filename: '[name]_[chunkhash].js',
-      library: '[name]_[chunkhash]'
+      filename: `${library}.js`,
+      library: library
     }
   };
 
