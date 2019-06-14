@@ -19,7 +19,7 @@ export const createMemory = (fs, cacheDir) => hash => {
     .catch(() => [])
     .filter(filename => /\.(js|map|css|)$/.test(path.extname(filename)))
     .map(filename =>
-      join(filename, fs.readFileAsync(path.join(cacheDir, hash, filename)))
+      join(filename, Promise.resolve(fs.readFileSync(path.join(cacheDir, hash, filename))))
     )
     .map(([filename, buffer]) => {
       mfs.writeFileSync(`/${filename}`, buffer);
