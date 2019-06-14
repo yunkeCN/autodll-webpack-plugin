@@ -2,7 +2,7 @@
   "name": "@yued/autodll-webpack-plugin",
   "author": "Asaf Katz",
   "license": "MIT",
-  "version": "0.3.5",
+  "version": "0.3.6",
   "description": "[![Build Status](https://travis-ci.org/asfktz/autodll-webpack-plugin.svg?branch=master)](https://travis-ci.org/asfktz/autodll-webpack-plugin)",
   "main": "lib/index.js",
   "scripts": {
